@@ -70,3 +70,4 @@ addSudo
 #     # 这边还需要加一些东西
 #     addGame
 # fi
+
