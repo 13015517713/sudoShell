@@ -22,32 +22,53 @@ fi
 #define FILE_ZSH_HISTORY ".zsh_history"
 #define FILE_ZSH_ZHISTORY ".zhistory"
 function getHistory(){
-    homePwd=`echo $HOME`
+    homeDir=`echo $HOME`
     fileName=`echo $HISTFILE`
     whichShell=`echo $SHELL`
-    tmp=$(echo $whichShell|grep "bash")
+    tmp=$(echo $whichShell|grep "bash")  # 得到什么shell  bash就返回真\zsh返回假\别的shell暂不支持
     status=$?
-    echo $status
-    if [ "$status"=="0" ] 
+    if [ $status -eq 0 ] 
     then
         # 直接采用bash_history
-        echo "用的bash"
-    else
-        # 尝试两种history（不同版本history文件不同）
-        echo "用的zsh"
+        echo ${homeDir}"/.bash_history"
+        return 0
     fi
-    # return $fileName
+    tmp=$(echo $whichShell|grep "zsh") 
+    status=$?
+    if [ $status -eq 0 ] 
+    then
+        # 两个都需要测试下
+        tmp=`ls ${homeDir}"/.zsh_history"`
+        status=$?
+        if [ $status -eq 0 ]
+        then
+            echo ${homeDir}"/.zsh_history"
+            return 0
+        fi
+        tmp=`ls ${homeDir}"/.zhistory"`
+        status=$? 
+        if [ $status -eq 0 ]
+        then
+            echo ${homeDir}"/.zhistory"
+            return 0
+        fi
+        return 1
+    fi
+    return 1
 }
-getHistory
-# echo $?
-exit
 # 在某个命令行前面加sudo
 function addSudo(){
     #首先得到filename  然后从文件中拿出最后一个就行了
-    
-    if 
-    # endCommand=`cat ~/.bash_history`
+    histFile=`getHistory`
+    echo $histFile
+    echo $histFile
+    endLine=`tail -n 1 $histFile`
+    echo $endLine
+    newCommand="sudo "${endLine}
+    echo $newCommand
 }
+addSudo
+exit 0
 # 打开游戏
 function addGame(){
     echo "测试"    
